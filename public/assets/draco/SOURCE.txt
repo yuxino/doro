@@ -1,0 +1,9 @@
+Draco glTF decoders bundled with three@0.185.1, copied without modification.
+Source: https://github.com/mrdoob/three.js/tree/r185/examples/jsm/libs/draco/gltf
+Draco license: https://github.com/google/draco/blob/main/LICENSE
+
+{
+  "draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+  "draco_decoder.wasm": "a680d927bed9cb864ddbd63521868891af2bfbe755092761b4837487618df8ac",
+  "draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+}

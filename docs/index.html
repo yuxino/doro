@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#faf8f4" />
+    <meta name="description" content="Doro 虾虾和 Doro 狗狗。转一转，看看它们的另一面。" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Doro</title>
+    <script type="module" crossorigin src="./assets/index-yWqYi_Q-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DA_MQhB2.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">从一张动图开始</p>
+          <h1><span lang="en">Doro</span></h1>
+        </div>
+        <div class="header-right">
+          <nav class="mode-picker" aria-label="选择 Doro">
+            <button data-mode="shrimp" aria-pressed="true">虾虾</button>
+            <span aria-hidden="true">/</span>
+            <button data-mode="dog" aria-pressed="false">狗狗</button>
+          </nav>
+          <p class="intro">转一转，看看它的另一面。</p>
+        </div>
+      </header>
+
+      <section class="exhibit" aria-label="Doro 立体展示">
+        <div class="viewer-column">
+          <div id="stage" class="stage" aria-busy="true">
+            <img id="poster" class="poster" alt="Doro 虾虾预览图" hidden />
+            <canvas id="canvas" tabindex="0" role="img" aria-label="可旋转的 Doro 虾虾三维模型" aria-describedby="gesture-help" hidden></canvas>
+            <div id="load-status" class="load-status" role="status" aria-live="polite">
+              <p id="load-title">Doro 正在过来…</p>
+              <p id="load-detail">正在加载立体模型</p>
+              <progress id="load-progress" aria-label="模型加载进度"></progress>
+              <button id="retry" class="text-button" hidden>重新加载 <span aria-hidden="true">↗</span></button>
+            </div>
+            <noscript><p class="no-script">开启 JavaScript 后，就能转着看 Doro 了。</p></noscript>
+          </div>
+
+          <div class="toolbar" aria-label="展示控制">
+            <div class="model-controls">
+              <button id="play" class="control control-primary" disabled aria-label="暂停动画">
+                <svg id="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10M11 3v10" /></svg>
+                <span id="play-label">暂停</span>
+              </button>
+              <button id="front" class="control" disabled>回正面</button>
+              <button id="head" class="control" disabled aria-pressed="false">看头部</button>
+            </div>
+            <button id="compare" class="control compare-control" aria-expanded="false" aria-controls="reference-panel">对照原图 <span class="compare-mark" aria-hidden="true">＋</span></button>
+          </div>
+        </div>
+
+        <aside id="reference-panel" class="reference-panel" aria-label="原图对照" hidden>
+          <div class="reference-heading"><span>最初的动图</span><span class="reference-index" aria-hidden="true">01</span></div>
+          <figure>
+            <img id="reference" alt="原始动图：粉色头发的 Doro 随着弯曲的虾身摆动" width="240" height="192" />
+            <p id="reference-error" class="reference-error" hidden>原图暂时没加载出来</p>
+            <figcaption>就是从这只开始的。</figcaption>
+          </figure>
+        </aside>
+      </section>
+
+      <footer class="page-footer">
+        <p id="gesture-help">拖动旋转 <span aria-hidden="true">·</span> 滚轮或双指缩放</p>
+        <p id="motion-note" aria-live="polite">Doro 可爱，虾也可爱。</p>
+      </footer>
+      <p class="sr-only">聚焦模型后，可用方向键旋转，加减键缩放，Home 键回到正面。</p>
+    </main>
+  </body>
+</html>
