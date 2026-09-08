@@ -7,7 +7,7 @@ import './style.css';
 
 const $ = (id) => document.getElementById(id);
 const ui = Object.fromEntries(['stage', 'canvas', 'poster', 'load-status', 'load-title', 'load-detail', 'load-progress', 'retry', 'play', 'play-icon', 'play-label', 'front', 'head', 'compare', 'reference-panel', 'reference', 'reference-error', 'motion-note'].map((id) => [id, $(id)]));
-const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
+const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}${/\.(glb|png)$/.test(name) ? `?v=${__ASSET_REVISION__}` : ''}`;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const originalCenter = new THREE.Vector3(0.13, 0.27, 0);
 const MODES = {
