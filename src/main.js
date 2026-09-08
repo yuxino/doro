@@ -128,28 +128,34 @@ function frameSubject(resetDirection = false, useAuthoredDirection = false) {
   const offset = camera.position.clone().sub(controls.target).normalize();
   let direction = offset;
   if (resetDirection || useAuthoredDirection) direction = new THREE.Vector3(0, 0, 1);
+  if (resetDirection && selectedMode === 'dog' && headNode) {
+    // The dog turns its head toward the viewer; front means the face's front.
+    direction.transformDirection(headNode.matrixWorld);
+  }
   if (useAuthoredDirection && !resetDirection && Array.isArray(viewerSettings.cameraDirection)
       && viewerSettings.cameraDirection.length === 3 && viewerSettings.cameraDirection.every(Number.isFinite)) {
     const authored = new THREE.Vector3(...viewerSettings.cameraDirection);
     if (authored.lengthSq() > 1e-8) direction = authored.normalize();
   }
   if (focusingHead) {
-    // Measure actual animated vertices, not empty corners of the bounds box.
-    // The latter can make this close-up smaller than the complete dog view.
+    // Fit the visible projection of the animated head. A surrounding sphere
+    // includes hidden depth and can shrink a close-up on a narrow screen.
     const point = new THREE.Vector3();
-    let radiusSquared = 0;
+    const right = new THREE.Vector3(0, 1, 0).cross(direction).normalize();
+    const up = direction.clone().cross(right).normalize();
+    let halfWidth = 0, halfHeight = 0;
     headNode.traverse((node) => {
       if (!node.isMesh) return;
       const position = node.geometry.getAttribute('position');
       if (!position) return;
       for (let index = 0; index < position.count; index += 1) {
-        node.getVertexPosition(index, point).applyMatrix4(node.matrixWorld);
-        radiusSquared = Math.max(radiusSquared, point.distanceToSquared(center));
+        node.getVertexPosition(index, point).applyMatrix4(node.matrixWorld).sub(center);
+        halfWidth = Math.max(halfWidth, Math.abs(point.dot(right)));
+        halfHeight = Math.max(halfHeight, Math.abs(point.dot(up)));
       }
     });
-    const diameter = Math.sqrt(radiusSquared) * 2 * 1.08;
-    baseHeight = diameter;
-    fitWidth = diameter;
+    baseHeight = halfHeight * 2 * 1.16;
+    fitWidth = halfWidth * 2 * 1.16;
   } else {
     const configuredScale = Number.isFinite(viewerSettings.orthoScale) && viewerSettings.orthoScale > 0 ? viewerSettings.orthoScale : selectedMode === 'shrimp' ? 5.6 : 0;
     // Authored three-quarter views must include body depth in their framing.
