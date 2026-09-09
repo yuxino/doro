@@ -8,7 +8,9 @@ for (const name of ['doro.glb', 'doro-dog.glb', 'poster.png', 'poster-dog.png', 
 }
 
 export default defineConfig({
-  base: './',
+  base: process.env.BUILD_PUBLIC_BASE_URL
+    ? `${process.env.BUILD_PUBLIC_BASE_URL.replace(/\/+$/, '')}/`
+    : './',
   define: { __ASSET_REVISION__: JSON.stringify(assetRevision.digest('hex').slice(0, 12)) },
   build: { target: 'es2022', sourcemap: false },
 });

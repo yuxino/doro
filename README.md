@@ -25,13 +25,15 @@ pnpm dev
 
 ## 发布到 Meow
 
-正式地址为 https://doro.yuxino.cn/。使用 `pnpm build` 生成 `dist/`，再通过已配置凭证的 `meow-release` CLI 发布：
+正式地址为 https://doro.yuxino.cn/。先预留版本，再用该版本的 CDN 目录构建 `dist/` 并发布：
 
 ```sh
+node /path/to/meow-release/dist/cli.js reserve --project doro --dir dist
+node scripts/build-meow.mjs
 node /path/to/meow-release/dist/cli.js release --project doro --dir dist
 ```
 
-发布需要独立的 `MEOW_RELEASE_TOKEN` 和 OSS 配置，通过进程环境提供，不写入仓库。Meow 保留独立版本，可在控制台查看和回滚。加载过程只显示文字与进度条，不展示预览背景图。
+发布需要独立的 `MEOW_RELEASE_TOKEN` 和 OSS 配置，通过进程环境提供，不写入仓库。所有模型、图片、脚本和解码器直接从 `img.yuxino.cn` 的版本目录加载，不经过 Meow 页面服务转发。Meow 保留独立版本，可在控制台查看和回滚。加载过程只显示文字与进度条，不展示预览背景图。
 
 ## GitHub Pages 回退站
 
