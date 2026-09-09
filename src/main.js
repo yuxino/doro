@@ -188,14 +188,8 @@ ui.head.addEventListener('click', () => {
 
 const catCaption = document.getElementById('cat-caption');
 function updateCatCaption() {
-  const isCat = Boolean(MODES[selectedMode].studio);
-  catCaption.hidden = !isCat || !model;
-  if (!isCat || !model) return;
-  const phase = (animation?.mixer.time || 0) % 6;
-  const lines = selectedMode === 'palico'
-    ? ['脑袋空空', '正在思考……', '脚先动，脑子等一下', '算了，先发呆']
-    : ['咪咪喵喵', '我刚才要干嘛来着', '小碎步启动', '累了，站一会儿'];
-  const text = lines[phase < 1.5 ? 0 : phase < 3 ? 1 : phase < 4.5 ? 2 : 3];
+  catCaption.hidden = selectedMode !== 'siamese' || !model;
+  const text = '咪咪喵喵地跑来跑去';
   if (catCaption.textContent !== text) catCaption.textContent = text;
 }
 
