@@ -112,3 +112,7 @@ figcaption { margin-top: 28px; font: 14px/1.6 "Songti SC", "STSong", Georgia, se
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 
 .cat-caption { position: absolute; bottom: 12px; left: 16px; right: 16px; text-align: center; pointer-events: none; color: var(--ink); font-size: clamp(17px, 2vw, 23px); font-weight: 650; letter-spacing: .06em; text-shadow: 0 1px 2px var(--paper); }
+
+.language-picker { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
+.language-picker button { border: 0; background: transparent; padding: 5px 0; cursor: pointer; color: var(--muted); }
+.language-picker button[aria-pressed="true"] { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
