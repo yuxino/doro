@@ -6,15 +6,15 @@ import { prepareAnimation } from './animation.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
-const ui = Object.fromEntries(['stage', 'canvas', 'poster', 'load-status', 'load-title', 'load-detail', 'load-progress', 'retry', 'play', 'play-icon', 'play-label', 'front', 'head', 'compare', 'reference-panel', 'reference', 'reference-error', 'motion-note'].map((id) => [id, $(id)]));
+const ui = Object.fromEntries(['stage', 'canvas', 'load-status', 'load-title', 'load-detail', 'load-progress', 'retry', 'play', 'play-icon', 'play-label', 'front', 'head', 'compare', 'reference-panel', 'reference', 'reference-error', 'motion-note'].map((id) => [id, $(id)]));
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}${/\.(glb|png)$/.test(name) ? `?v=${__ASSET_REVISION__}` : ''}`;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const originalCenter = new THREE.Vector3(0.13, 0.27, 0);
 const MODES = {
-  shrimp: { label: '虾虾', name: 'Doro 虾虾', head: 'Doro · 3D head', model: 'doro.glb', poster: 'poster.png', note: 'Doro 可爱，虾也可爱。' },
-  dog: { label: '狗狗', name: 'Doro 狗狗', head: 'Doro · 3D head', model: 'doro-dog.glb', poster: 'poster-dog.png', note: '同一颗小脑袋，换了四只小短腿。' },
-  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', poster: 'palico.png', note: '圆脸、大耳朵，站好给你看看。', static: true },
-  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', poster: 'siamese.png', note: '呆猫的脑袋，配上四只小猫腿。', static: true },
+  shrimp: { label: '虾虾', name: 'Doro 虾虾', head: 'Doro · 3D head', model: 'doro.glb', note: 'Doro 可爱，虾也可爱。' },
+  dog: { label: '狗狗', name: 'Doro 狗狗', head: 'Doro · 3D head', model: 'doro-dog.glb', note: '同一颗小脑袋，换了四只小短腿。' },
+  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', note: '圆脸、大耳朵，站好给你看看。', static: true },
+  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', note: '呆猫的脑袋，配上四只小猫腿。', static: true },
 };
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-2.8, 2.8, 2.8, -2.8, 0.01, 100);
@@ -50,16 +50,6 @@ let shrimpReferenceOpen = innerWidth >= 980 && !reducedMotion.matches;
 // Read-only diagnostics make export/clip conflicts inspectable during QA.
 window.doroViewer = { state: 'loading', mode: selectedMode, animation: null, headFound: false };
 
-ui.poster.addEventListener('load', () => {
-  if (ui.poster.currentSrc !== new URL(asset(MODES[selectedMode].poster), location.href).href) return;
-  if (!model) ui.poster.hidden = false;
-  ui.stage.classList.add('has-poster');
-  if (window.doroViewer.state === 'error') ui['load-detail'].textContent = '先看看预览图，也可以重新加载。';
-});
-ui.poster.addEventListener('error', () => {
-  ui.poster.hidden = true;
-  ui.stage.classList.remove('has-poster');
-});
 ui.reference.addEventListener('error', () => {
   ui.reference.hidden = true;
   ui['reference-error'].hidden = false;
@@ -289,10 +279,9 @@ function showError(error) {
   window.doroViewer.error = error.message;
   ui.stage.setAttribute('aria-busy', 'false');
   ui.canvas.hidden = true;
-  ui.poster.hidden = !ui.stage.classList.contains('has-poster');
   ui['load-status'].hidden = false;
   ui['load-title'].textContent = '3D 暂时没加载出来';
-  ui['load-detail'].textContent = ui.poster.hidden ? '可以再试一次，或稍后回来看看。' : '先看看预览图，也可以重新加载。';
+  ui['load-detail'].textContent = '可以再试一次，或稍后回来看看。';
   ui['load-progress'].hidden = true;
   ui.retry.hidden = false;
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
@@ -370,10 +359,6 @@ async function loadModel() {
   releaseModel();
   ui.canvas.hidden = true;
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
-  ui.poster.hidden = true;
-  ui.stage.classList.remove('has-poster');
-  ui.poster.alt = `${MODES[mode].name}预览图`;
-  ui.poster.src = asset(MODES[mode].poster);
   ui.canvas.setAttribute('aria-label', `可旋转的 ${MODES[mode].name}三维模型`);
   ui['load-status'].hidden = false;
   window.doroViewer = { state: 'loading', mode, animation: null, headFound: false };
@@ -430,7 +415,6 @@ async function loadModel() {
     scene.add(model);
     frameSubject(false, true);
     ui.canvas.hidden = false;
-    ui.poster.hidden = true;
     ui['load-status'].hidden = true;
     ui.stage.setAttribute('aria-busy', 'false');
     ui.play.disabled = !animation.actions.length;

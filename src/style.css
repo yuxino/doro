@@ -41,9 +41,7 @@ h1 span[lang] { letter-spacing: -.06em; }
 .stage { position: relative; width: 100%; height: clamp(420px, calc(100svh - 280px), 850px); overflow: hidden; isolation: isolate; }
 canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 canvas:active { cursor: grabbing; }
-.poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 28px 14px 84px; }
-.load-status { position: absolute; inset: auto 24px 28px; display: grid; justify-items: center; text-align: center; gap: 7px; }
-.stage:not(.has-poster) .load-status { inset: 0 24px; align-content: center; }
+.load-status { position: absolute; inset: 0 24px; align-content: center; display: grid; justify-items: center; text-align: center; gap: 7px; }
 #load-title { font: 20px/1.4 "Songti SC", "STSong", Georgia, serif; }
 #load-detail { font-size: 12px; line-height: 1.6; color: var(--muted); }
 progress { width: 112px; height: 2px; margin-top: 8px; border: 0; appearance: none; background: var(--line); }
