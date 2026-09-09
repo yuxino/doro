@@ -31,7 +31,7 @@ h1 span[lang] { letter-spacing: -.06em; }
 .title-dot { margin-left: .07em; }
 .intro { font: 15px/1.7 "Songti SC", "STSong", Georgia, serif; color: #625e58; padding-bottom: 1px; }
 .header-right { display: grid; justify-items: end; gap: 14px; }
-.mode-picker { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+.mode-picker { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 14px; font-size: 12px; }
 .mode-picker button { border: 0; padding: 4px 0 7px; background: none; cursor: pointer; color: var(--muted); }
 .mode-picker button[aria-pressed="true"] { color: var(--ink); border-bottom: 1px solid var(--ink); }
 .mode-picker span { color: #b8b2a8; font: 13px Georgia, serif; }
@@ -86,12 +86,13 @@ figcaption { margin-top: 28px; font: 14px/1.6 "Songti SC", "STSong", Georgia, se
 }
 @media (max-width: 699px) {
   .page { padding: 28px 20px 22px; }
-  .page-header { padding-bottom: 24px; }
+  .page-header { padding-bottom: 24px; gap: 22px; }
   .eyebrow { font-size: 10px; margin-bottom: 10px; }
   h1 { font-size: 36px; }
   .intro { font-size: 13px; line-height: 1.65; }
   .header-right { gap: 12px; }
-  .mode-picker { gap: 13px; }
+  .mode-picker { gap: 8px 13px; max-width: 240px; }
+  .mode-picker button { min-height: 36px; }
   .header-right .intro { max-width: 14em; text-align: right; }
   .exhibit.is-comparing { grid-template-columns: minmax(0, 1fr); }
   .stage { height: clamp(365px, calc(100svh - 250px), 680px); }

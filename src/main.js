@@ -11,17 +11,25 @@ const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}${/\.(glb|png)
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const originalCenter = new THREE.Vector3(0.13, 0.27, 0);
 const MODES = {
-  shrimp: { label: '虾虾', model: 'doro.glb', poster: 'poster.png', note: 'Doro 可爱，虾也可爱。' },
-  dog: { label: '狗狗', model: 'doro-dog.glb', poster: 'poster-dog.png', note: '同一颗小脑袋，换了四只小短腿。' },
+  shrimp: { label: '虾虾', name: 'Doro 虾虾', head: 'Doro · 3D head', model: 'doro.glb', poster: 'poster.png', note: 'Doro 可爱，虾也可爱。' },
+  dog: { label: '狗狗', name: 'Doro 狗狗', head: 'Doro · 3D head', model: 'doro-dog.glb', poster: 'poster-dog.png', note: '同一颗小脑袋，换了四只小短腿。' },
+  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', poster: 'palico.png', note: '圆脸、大耳朵，站好给你看看。', static: true },
+  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', poster: 'siamese.png', note: '呆猫的脑袋，配上四只小猫腿。', static: true },
 };
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-2.8, 2.8, 2.8, -2.8, 0.01, 100);
 camera.up.set(0, 1, 0);
 camera.position.set(0.13, 0.27, 12);
-scene.add(new THREE.HemisphereLight(0xffffff, 0xe1ddd6, 2));
+const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xe1ddd6, 2);
+scene.add(hemisphereLight);
 const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
 keyLight.position.set(-3, 5, 8);
 scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xffffff, 0);
+fillLight.position.set(4, 3, 5);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0);
+rimLight.position.set(-1, 5, -4);
+scene.add(fillLight, rimLight);
 
 let renderer, controls, model, headNode, animation, dracoLoader;
 let playing = !reducedMotion.matches;
@@ -75,6 +83,12 @@ ui.compare.addEventListener('click', () => {
 setReference(shrimpReferenceOpen);
 
 function updatePlayButton() {
+  if (MODES[selectedMode].static) {
+    ui['play-label'].textContent = '静态';
+    ui.play.setAttribute('aria-label', '静态模型');
+    ui['play-icon'].innerHTML = '<path d="M4 4h8v8H4Z" />';
+    return;
+  }
   ui['play-label'].textContent = playing ? '暂停' : '播放';
   ui.play.setAttribute('aria-label', playing ? '暂停动画' : '播放动画');
   ui['play-icon'].innerHTML = playing ? '<path d="M5 3v10M11 3v10" />' : '<path d="m5 3 8 5-8 5Z" />';
@@ -92,7 +106,7 @@ reducedMotion.addEventListener('change', (event) => {
   playing = false;
   updatePlayButton();
   setReference(false);
-  ui['motion-note'].textContent = '已按系统偏好暂停，可随时点播放。';
+  ui['motion-note'].textContent = MODES[selectedMode].static ? MODES[selectedMode].note : '已按系统偏好暂停，可随时点播放。';
 });
 
 function resize() {
@@ -207,6 +221,17 @@ document.addEventListener('visibilitychange', () => {
   if (renderer) renderer.setAnimationLoop(document.hidden ? null : animate);
   needsRender = true;
 });
+
+function applyModeLighting() {
+  const studio = MODES[selectedMode].static;
+  renderer.toneMapping = studio ? THREE.AgXToneMapping : THREE.NoToneMapping;
+  renderer.toneMappingExposure = studio ? 1.5 : 1;
+  keyLight.intensity = studio ? 4.5 : 2.2;
+  hemisphereLight.intensity = studio ? 1.2 : 2;
+  fillLight.intensity = studio ? 1 : 0;
+  rimLight.intensity = studio ? 1.3 : 0;
+  needsRender = true;
+}
 
 function initRenderer() {
   renderer = new THREE.WebGLRenderer({ canvas: ui.canvas, antialias: true, alpha: true });
@@ -347,19 +372,21 @@ async function loadModel() {
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
   ui.poster.hidden = true;
   ui.stage.classList.remove('has-poster');
-  ui.poster.alt = `Doro ${MODES[mode].label}预览图`;
+  ui.poster.alt = `${MODES[mode].name}预览图`;
   ui.poster.src = asset(MODES[mode].poster);
-  ui.canvas.setAttribute('aria-label', `可旋转的 Doro ${MODES[mode].label}三维模型`);
+  ui.canvas.setAttribute('aria-label', `可旋转的 ${MODES[mode].name}三维模型`);
   ui['load-status'].hidden = false;
   window.doroViewer = { state: 'loading', mode, animation: null, headFound: false };
   ui.stage.setAttribute('aria-busy', 'true');
-  ui['load-title'].textContent = 'Doro 正在过来…';
+  ui['load-title'].textContent = `${MODES[mode].name}正在过来…`;
   ui['load-detail'].textContent = '正在加载立体模型';
   ui['load-progress'].hidden = false;
   ui['load-progress'].removeAttribute('value');
   ui.retry.hidden = true;
   try {
     if (!renderer) initRenderer();
+    applyModeLighting();
+    updatePlayButton();
     const bytes = await fetchModel(mode, controller.signal, generation);
     // A fetch can be aborted; an in-progress Draco parse cannot. Serialize
     // decodes, dispose any obsolete result, and never display both models.
@@ -396,7 +423,9 @@ async function loadModel() {
     cameraDistance = Number.isFinite(viewerSettings.cameraDistance) && viewerSettings.cameraDistance > radius ? viewerSettings.cameraDistance : Math.max(12, radius * 4);
     camera.far = Math.max(100, cameraDistance + radius * 8);
     model.traverse((node) => {
-      if (node.userData.name === 'Doro · 3D head' || node.name === 'Doro · 3D head' || /doro.*3d[_\s·.-]*head/i.test(node.name)) headNode = node;
+      if (node.userData.name === MODES[mode].head || node.name === MODES[mode].head
+          || node.name === THREE.PropertyBinding.sanitizeNodeName(MODES[mode].head)
+          || (MODES[mode].head === 'Doro · 3D head' && /doro.*3d[_\s·.-]*head/i.test(node.name))) headNode = node;
     });
     scene.add(model);
     frameSubject(false, true);
@@ -428,7 +457,7 @@ for (const button of document.querySelectorAll('[data-mode]')) {
     for (const option of document.querySelectorAll('[data-mode]')) option.setAttribute('aria-pressed', String(option === button));
     ui.compare.hidden = selectedMode !== 'shrimp';
     setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
-    ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
+    ui['motion-note'].textContent = (playing || MODES[selectedMode].static) ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
     loadModel();
   });
 }
