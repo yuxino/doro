@@ -11,10 +11,10 @@ const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}${/\.(glb|png)
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const originalCenter = new THREE.Vector3(0.13, 0.27, 0);
 const MODES = {
-  shrimp: { label: '虾虾', name: 'Doro 虾虾', head: 'Doro · 3D head', model: 'doro.glb', note: 'Doro 可爱，虾也可爱。' },
-  dog: { label: '狗狗', name: 'Doro 狗狗', head: 'Doro · 3D head', model: 'doro-dog.glb', note: '同一颗小脑袋，换了四只小短腿。' },
-  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', note: '圆脸、大耳朵，站好给你看看。', studio: true },
-  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', note: '呆猫的脑袋，配上四只小猫腿。', studio: true },
+  shrimp: { label: 'Shrimp', name: 'Doro Shrimp', head: 'Doro · 3D head', model: 'doro.glb', note: 'Doro is cute. So are shrimp.' },
+  dog: { label: 'Puppy', name: 'Doro Puppy', head: 'Doro · 3D head', model: 'doro-dog.glb', note: 'The same little head, now with four tiny legs.' },
+  palico: { label: 'Blue Cat', name: 'Blue Cat', head: 'Kit T head', model: 'palico.glb', note: 'Round face, big ears, standing still for you.', studio: true },
+  siamese: { label: 'Cat on All Fours', name: 'Cat on All Fours', head: 'Kit T head', model: 'siamese.glb', note: 'That little face, with four little paws.', studio: true },
 };
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-2.8, 2.8, 2.8, -2.8, 0.01, 100);
@@ -74,24 +74,24 @@ ui.compare.addEventListener('click', () => {
 setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
 
 function updatePlayButton() {
-  ui['play-label'].textContent = playing ? '暂停' : '播放';
-  ui.play.setAttribute('aria-label', playing ? '暂停动画' : '播放动画');
+  ui['play-label'].textContent = playing ? 'Pause' : 'Play';
+  ui.play.setAttribute('aria-label', playing ? 'Pause animation' : 'Play animation');
   ui['play-icon'].innerHTML = playing ? '<path d="M5 3v10M11 3v10" />' : '<path d="m5 3 8 5-8 5Z" />';
 }
 updatePlayButton();
-if (reducedMotion.matches) ui['motion-note'].textContent = '已按系统偏好暂停，可随时点播放。';
+if (reducedMotion.matches) ui['motion-note'].textContent = 'Paused for reduced motion. Press Play whenever you like.';
 ui.play.addEventListener('click', () => {
   playing = !playing;
   lastFrame = performance.now();
   updatePlayButton();
-  ui['motion-note'].textContent = playing ? MODES[selectedMode].note : '停一会儿，转着看看。';
+  ui['motion-note'].textContent = playing ? MODES[selectedMode].note : 'Paused. Take a look around.';
 });
 reducedMotion.addEventListener('change', (event) => {
   if (!event.matches) return;
   playing = false;
   updatePlayButton();
   setReference(false);
-  ui['motion-note'].textContent = '已按系统偏好暂停，可随时点播放。';
+  ui['motion-note'].textContent = 'Paused for reduced motion. Press Play whenever you like.';
 });
 
 function resize() {
@@ -182,7 +182,7 @@ function frameSubject(resetDirection = false, useAuthoredDirection = false) {
 ui.front.addEventListener('click', () => frameSubject(true));
 ui.head.addEventListener('click', () => {
   focusingHead = !focusingHead;
-  ui.head.textContent = focusingHead ? '看整体' : '看头部';
+  ui.head.textContent = focusingHead ? 'Full view' : 'Head';
   ui.head.setAttribute('aria-pressed', String(focusingHead));
   frameSubject();
 });
@@ -190,7 +190,7 @@ ui.head.addEventListener('click', () => {
 const catCaption = document.getElementById('cat-caption');
 function updateCatCaption() {
   catCaption.hidden = selectedMode !== 'siamese' || !model;
-  const text = '咪咪喵喵地跑来跑去';
+  const text = 'Meow meow, running all around.';
   if (catCaption.textContent !== text) catCaption.textContent = text;
 }
 
@@ -248,8 +248,8 @@ function initRenderer() {
     event.preventDefault();
     renderer.setAnimationLoop(null);
     showError(new Error('WebGL context lost'));
-    ui['load-title'].textContent = '展示暂时停了一下';
-    ui['load-detail'].textContent = '重新加载就能再转着看。';
+    ui['load-title'].textContent = 'The viewer paused';
+    ui['load-detail'].textContent = 'Reload to keep exploring.';
     ui.retry.onclick = () => location.reload();
   });
   ui.canvas.addEventListener('keydown', (event) => {
@@ -283,8 +283,8 @@ function showError(error) {
   ui.stage.setAttribute('aria-busy', 'false');
   ui.canvas.hidden = true;
   ui['load-status'].hidden = false;
-  ui['load-title'].textContent = '3D 暂时没加载出来';
-  ui['load-detail'].textContent = '可以再试一次，或稍后回来看看。';
+  ui['load-title'].textContent = 'The 3D model could not load';
+  ui['load-detail'].textContent = 'Try again, or come back in a moment.';
   ui['load-progress'].hidden = true;
   ui.retry.hidden = false;
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
@@ -308,9 +308,9 @@ async function fetchModel(mode, signal, generation) {
     if (total > 0) {
       const fraction = Math.min(received / total, 1);
       ui['load-progress'].value = fraction;
-      ui['load-detail'].textContent = `正在加载立体模型 · ${Math.round(fraction * 100)}%`;
+      ui['load-detail'].textContent = `Loading 3D model · ${Math.round(fraction * 100)}%`;
     } else {
-      ui['load-detail'].textContent = `正在加载立体模型 · ${(received / 1048576).toFixed(1)} MB`;
+      ui['load-detail'].textContent = `Loading 3D model · ${(received / 1048576).toFixed(1)} MB`;
     }
   }
   const bytes = new Uint8Array(received);
@@ -347,7 +347,7 @@ function releaseModel() {
   headNode = null;
   viewerSettings = {};
   focusingHead = false;
-  ui.head.textContent = '看头部';
+  ui.head.textContent = 'Head';
   ui.head.setAttribute('aria-pressed', 'false');
   renderer?.renderLists.dispose();
 }
@@ -363,12 +363,12 @@ async function loadModel() {
   catCaption.hidden = true;
   ui.canvas.hidden = true;
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
-  ui.canvas.setAttribute('aria-label', `可旋转的 ${MODES[mode].name}三维模型`);
+  ui.canvas.setAttribute('aria-label', `Interactive 3D model of ${MODES[mode].name}`);
   ui['load-status'].hidden = false;
   window.doroViewer = { state: 'loading', mode, animation: null, headFound: false };
   ui.stage.setAttribute('aria-busy', 'true');
-  ui['load-title'].textContent = `${MODES[mode].name}正在过来…`;
-  ui['load-detail'].textContent = '正在加载立体模型';
+  ui['load-title'].textContent = `Here comes ${MODES[mode].name}…`;
+  ui['load-detail'].textContent = 'Loading 3D model';
   ui['load-progress'].hidden = false;
   ui['load-progress'].removeAttribute('value');
   ui.retry.hidden = true;
@@ -382,7 +382,7 @@ async function loadModel() {
     if (pendingParse) await pendingParse.catch(() => {});
     if (generation !== loadGeneration) return;
     if (controller.signal.aborted) throw new Error('Model load timed out');
-    ui['load-detail'].textContent = '快好啦…';
+    ui['load-detail'].textContent = 'Almost there…';
     const loader = new GLTFLoader();
     // Both compressed and ordinary GLBs work. Decoder files match the pinned
     // Three.js package and are served from this site, including Pages subpaths.
@@ -444,7 +444,7 @@ function syncSelectedMode() {
   }
   ui.compare.hidden = selectedMode !== 'shrimp';
   setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
-  ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
+  ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? 'Paused for reduced motion. Press Play whenever you like.' : 'Paused. Take a look around.';
 }
 for (const button of document.querySelectorAll('[data-mode]')) {
   button.addEventListener('click', () => {
