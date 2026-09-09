@@ -36,7 +36,8 @@ let playing = !reducedMotion.matches;
 let focusingHead = false;
 let baseHeight = 5.6;
 let fitWidth = 0;
-let selectedMode = 'shrimp';
+const requestedMode = new URLSearchParams(location.search).get('model');
+let selectedMode = Object.hasOwn(MODES, requestedMode) ? requestedMode : 'shrimp';
 let viewerSettings = {};
 let cameraDistance = 12;
 let needsRender = true;
@@ -70,7 +71,7 @@ ui.compare.addEventListener('click', () => {
   shrimpReferenceOpen = ui['reference-panel'].hidden;
   setReference(shrimpReferenceOpen);
 });
-setReference(shrimpReferenceOpen);
+setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
 
 function updatePlayButton() {
   ui['play-label'].textContent = playing ? '暂停' : '播放';
@@ -437,15 +438,24 @@ async function loadModel() {
   }
 }
 ui.retry.addEventListener('click', loadModel);
+function syncSelectedMode() {
+  for (const option of document.querySelectorAll('[data-mode]')) {
+    option.setAttribute('aria-pressed', String(option.dataset.mode === selectedMode));
+  }
+  ui.compare.hidden = selectedMode !== 'shrimp';
+  setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
+  ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
+}
 for (const button of document.querySelectorAll('[data-mode]')) {
   button.addEventListener('click', () => {
     if (button.dataset.mode === selectedMode) return;
     selectedMode = button.dataset.mode;
-    for (const option of document.querySelectorAll('[data-mode]')) option.setAttribute('aria-pressed', String(option === button));
-    ui.compare.hidden = selectedMode !== 'shrimp';
-    setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
-    ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
+    const url = new URL(location.href);
+    url.searchParams.set('model', selectedMode);
+    history.replaceState(history.state, '', url);
+    syncSelectedMode();
     loadModel();
   });
 }
+syncSelectedMode();
 loadModel();

@@ -44,3 +44,10 @@ pnpm build:pages
 将更新后的源文件与 `docs/` 一起提交到 `main`。Pages 从 `main` 的 `/docs` 发布；相对资源路径支持仓库子目录。
 
 虾虾和狗狗的动画采用 112 帧、50 fps 的 2.24 秒循环。GLB 内含额外的闭合终点，网页按经过的时间播放。原始 Blender 工程单独交付，不依赖网页运行。
+
+### 角色直达链接
+
+- 蓝色呆猫：https://doro.yuxino.cn/?model=palico
+- 四足呆猫：https://doro.yuxino.cn/?model=siamese
+
+切换角色后，地址栏会同步更新，复制当前地址即可分享该角色。没有参数或参数无效时仍显示 Doro 虾虾。
