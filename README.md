@@ -2,7 +2,7 @@
 
 从一张 Doro 虾动图开始，做成可以转着看的 3D 虾虾，又加了一只短腿小狗。
 
-[打开网页](https://yuxino.github.io/doro/)
+[打开网页](https://doro.yuxino.cn/)
 
 选择虾虾、狗狗、蓝色呆猫或四足呆猫，拖动旋转，滚轮或双指缩放。可以暂停动画、回到正面、凑近看头部；虾虾还可以展开原始动图对照。
 
@@ -23,7 +23,17 @@ pnpm dev
 
 模型和图片位于 `public/assets/`。依赖版本已锁定，无外部字体或分析脚本。
 
-## 更新 GitHub Pages
+## 发布到 Meow
+
+正式地址为 https://doro.yuxino.cn/。使用 `pnpm build` 生成 `dist/`，再通过已配置凭证的 `meow-release` CLI 发布：
+
+```sh
+node /path/to/meow-release/dist/cli.js release --project doro --dir dist
+```
+
+发布需要独立的 `MEOW_RELEASE_TOKEN` 和 OSS 配置，通过进程环境提供，不写入仓库。Meow 保留独立版本，可在控制台查看和回滚。加载过程只显示文字与进度条，不展示预览背景图。
+
+## GitHub Pages 回退站
 
 ```sh
 pnpm build:pages
