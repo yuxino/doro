@@ -13,8 +13,8 @@ const originalCenter = new THREE.Vector3(0.13, 0.27, 0);
 const MODES = {
   shrimp: { label: '虾虾', name: 'Doro 虾虾', head: 'Doro · 3D head', model: 'doro.glb', note: 'Doro 可爱，虾也可爱。' },
   dog: { label: '狗狗', name: 'Doro 狗狗', head: 'Doro · 3D head', model: 'doro-dog.glb', note: '同一颗小脑袋，换了四只小短腿。' },
-  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', note: '圆脸、大耳朵，站好给你看看。', static: true },
-  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', note: '呆猫的脑袋，配上四只小猫腿。', static: true },
+  palico: { label: '蓝色呆猫', name: '蓝色呆猫', head: 'Kit T head', model: 'palico.glb', note: '圆脸、大耳朵，站好给你看看。', studio: true },
+  siamese: { label: '四足呆猫', name: '四足呆猫', head: 'Kit T head', model: 'siamese.glb', note: '呆猫的脑袋，配上四只小猫腿。', studio: true },
 };
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-2.8, 2.8, 2.8, -2.8, 0.01, 100);
@@ -73,12 +73,6 @@ ui.compare.addEventListener('click', () => {
 setReference(shrimpReferenceOpen);
 
 function updatePlayButton() {
-  if (MODES[selectedMode].static) {
-    ui['play-label'].textContent = '静态';
-    ui.play.setAttribute('aria-label', '静态模型');
-    ui['play-icon'].innerHTML = '<path d="M4 4h8v8H4Z" />';
-    return;
-  }
   ui['play-label'].textContent = playing ? '暂停' : '播放';
   ui.play.setAttribute('aria-label', playing ? '暂停动画' : '播放动画');
   ui['play-icon'].innerHTML = playing ? '<path d="M5 3v10M11 3v10" />' : '<path d="m5 3 8 5-8 5Z" />';
@@ -96,7 +90,7 @@ reducedMotion.addEventListener('change', (event) => {
   playing = false;
   updatePlayButton();
   setReference(false);
-  ui['motion-note'].textContent = MODES[selectedMode].static ? MODES[selectedMode].note : '已按系统偏好暂停，可随时点播放。';
+  ui['motion-note'].textContent = '已按系统偏好暂停，可随时点播放。';
 });
 
 function resize() {
@@ -192,6 +186,19 @@ ui.head.addEventListener('click', () => {
   frameSubject();
 });
 
+const catCaption = document.getElementById('cat-caption');
+function updateCatCaption() {
+  const isCat = Boolean(MODES[selectedMode].studio);
+  catCaption.hidden = !isCat || !model;
+  if (!isCat || !model) return;
+  const phase = (animation?.mixer.time || 0) % 6;
+  const lines = selectedMode === 'palico'
+    ? ['脑袋空空', '正在思考……', '脚先动，脑子等一下', '算了，先发呆']
+    : ['咪咪喵喵', '我刚才要干嘛来着', '小碎步启动', '累了，站一会儿'];
+  const text = lines[phase < 1.5 ? 0 : phase < 3 ? 1 : phase < 4.5 ? 2 : 3];
+  if (catCaption.textContent !== text) catCaption.textContent = text;
+}
+
 function animate(now) {
   const delta = Math.max(0, Math.min((now - lastFrame) / 1000, 0.1));
   lastFrame = now;
@@ -201,6 +208,7 @@ function animate(now) {
     animation.mixer.update(delta);
     needsRender = true;
   }
+  updateCatCaption();
   if (needsRender || moved) {
     renderer.render(scene, camera);
     needsRender = false;
@@ -213,7 +221,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function applyModeLighting() {
-  const studio = MODES[selectedMode].static;
+  const studio = MODES[selectedMode].studio;
   renderer.toneMapping = studio ? THREE.AgXToneMapping : THREE.NoToneMapping;
   renderer.toneMappingExposure = studio ? 1.5 : 1;
   keyLight.intensity = studio ? 4.5 : 2.2;
@@ -357,6 +365,7 @@ async function loadModel() {
   loadAbort = controller;
   const timeout = setTimeout(() => controller.abort(), 120000);
   releaseModel();
+  catCaption.hidden = true;
   ui.canvas.hidden = true;
   ui.play.disabled = ui.front.disabled = ui.head.disabled = true;
   ui.canvas.setAttribute('aria-label', `可旋转的 ${MODES[mode].name}三维模型`);
@@ -441,7 +450,7 @@ for (const button of document.querySelectorAll('[data-mode]')) {
     for (const option of document.querySelectorAll('[data-mode]')) option.setAttribute('aria-pressed', String(option === button));
     ui.compare.hidden = selectedMode !== 'shrimp';
     setReference(selectedMode === 'shrimp' && shrimpReferenceOpen);
-    ui['motion-note'].textContent = (playing || MODES[selectedMode].static) ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
+    ui['motion-note'].textContent = playing ? MODES[selectedMode].note : reducedMotion.matches ? '已按系统偏好暂停，可随时点播放。' : '停一会儿，转着看看。';
     loadModel();
   });
 }
