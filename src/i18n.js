@@ -1,3 +1,5 @@
+import { startRegionLanguage } from './region-language.ts';
+
 const chinese = {
   "Doro as a shrimp, a puppy, and two blue cats. Spin them around and see every side.": "Doro 虾虾、狗狗，以及两只蓝色呆猫。转一转，看看它们的另一面。",
   "It started with a GIF": "从一张动图开始",
@@ -47,16 +49,15 @@ const chinese = {
   "Almost there…": "快好啦…",
   "Language": "语言"
 };
-export function detectLanguage(locale = 'en') {
-  const parts = locale.replaceAll('_', '-').split('-');
-  return parts[0].toLowerCase() === 'zh' || parts.some(p => ['CN', 'HK', 'MO', 'TW'].includes(p.toUpperCase())) ? 'zh' : 'en';
+// This accepts an IP geolocation country code, never navigator.language or a locale tag.
+export function detectLanguage(country) {
+  return typeof country === 'string' && ['CN', 'HK', 'MO', 'TW'].includes(country) ? 'zh' : 'en';
 }
-let saved;
-try { saved = localStorage.getItem('doro-language'); } catch {}
-export let language = ['zh', 'en'].includes(saved) ? saved : detectLanguage(navigator.language);
+export let language = 'en';
 const bindings = new Map();
 const staticText = [];
 const attributes = [];
+let initialized = false;
 export function t(value) {
   if (language === 'en') return value;
   if (chinese[value]) return chinese[value];
@@ -77,6 +78,8 @@ function apply() {
   for (const button of document.querySelectorAll('[data-language]')) button.setAttribute('aria-pressed', String(button.dataset.language === language));
 }
 export function initializeLanguage() {
+  if (initialized) return;
+  initialized = true;
   const dynamic = '[data-mode], #play-label, #head, #motion-note, #load-title, #load-detail, #cat-caption';
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   while (walker.nextNode()) {
@@ -87,12 +90,9 @@ export function initializeLanguage() {
     if (element.id === 'canvas' || element.id === 'play') continue;
     for (const attr of ['aria-label', 'alt', 'content']) if (element.hasAttribute(attr)) attributes.push([element, attr, element.getAttribute(attr)]);
   }
-  for (const button of document.querySelectorAll('[data-language]')) button.addEventListener('click', () => {
-    try { localStorage.setItem('doro-language', button.dataset.language); } catch {}
-    if (language === button.dataset.language) return;
-    language = button.dataset.language;
+  startRegionLanguage((nextLanguage) => {
+    language = nextLanguage;
     apply();
     window.dispatchEvent(new Event('doro-languagechange'));
   });
-  apply();
 }
