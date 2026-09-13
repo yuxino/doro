@@ -9,6 +9,12 @@
     "build:pages": "vite build --outDir docs",
     "preview": "vite preview --host 127.0.0.1"
   },
-  "dependencies": { "three": "0.185.1" },
-  "devDependencies": { "vite": "8.2.2" }
+  "dependencies": {
+    "three": "0.185.1",
+    "web-shared": "https://codeload.github.com/yuxino-labs/web-shared/tar.gz/ea39c2fcb1c521b097c9c04e6d6d52e4b68a9571"
+  },
+  "devDependencies": {
+    "vite": "8.2.2"
+  },
+  "packageManager": "pnpm@12.3.4"
 }
