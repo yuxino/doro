@@ -1,0 +1,12 @@
+name: Shared language upgrade
+on:
+  push:
+    branches: [chore/shared-language-v040]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  migrate:
+    uses: yuxino-labs/web-shared/.github/workflows/adopt-region-language.yml@c73ec7b6a3ed8a4e351d257184e0b8b03e8be017
+    with:
+      shared-ref: c73ec7b6a3ed8a4e351d257184e0b8b03e8be017
