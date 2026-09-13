@@ -7,6 +7,6 @@ permissions:
   contents: write
 jobs:
   migrate:
-    uses: yuxino-labs/web-shared/.github/workflows/adopt-region-language.yml@c73ec7b6a3ed8a4e351d257184e0b8b03e8be017
+    uses: yuxino-labs/web-shared/.github/workflows/adopt-region-language.yml@ea39c2fcb1c521b097c9c04e6d6d52e4b68a9571
     with:
-      shared-ref: c73ec7b6a3ed8a4e351d257184e0b8b03e8be017
+      shared-ref: ea39c2fcb1c521b097c9c04e6d6d52e4b68a9571
